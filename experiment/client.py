@@ -1,4 +1,5 @@
 import base64
+import datetime
 import json
 import requests
 import os
@@ -42,7 +43,7 @@ def test_plan_action(image_path, task_prompt,api_url=API_HOST + "/api/lam/planAc
         # 2. 构造请求参数
         request_data = {
             "uid": "test_user_123",
-            "tid": "task_456",
+            "tid": "tmp__" + datetime.datetime.now().strftime("%Y%m%d%H%M%S"),
             "task": task_prompt,  # 首次调用必填
             "language": "中文",
             "image": base64_image

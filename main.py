@@ -42,7 +42,7 @@ async def plan_action(request: PlanActionRequest):
 if __name__ == '__main__':
     #uvicorn main:app --host 0.0.0.0 --port 6666 --reload
     mg = MongoDBClient()
-    mg.clear_all_history()
+    mg.clear_tmp_history()
     task_dir = os.path.join(current_dir, "task")
     clear(task_dir)
     task_dir = os.path.join(current_dir, "img_mark_log")
