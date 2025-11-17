@@ -1,0 +1,7 @@
+paddlepaddle==2.6.2
+paddleocr==2.8.1
+#pillow==11.2.1
+fastapi
+uvicorn
+pymongo
+# -i https://pypi.tuna.tsinghua.edu.cn/simple/
