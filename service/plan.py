@@ -139,7 +139,7 @@ def process_request(request: PlanActionRequest) -> PlanActionResponse:
             param = param_list[0]
             if action_type == "click" and isinstance(param, tuple) and len(param) == 2:
                 # 坐标转换为字符串格式
-                box_args = [str(int(param[0]/1000*width)), str(int(param[1]/1000*height))]
+                box_args = [str(param[0]), str(param[1])]
                 # 将坐标绘制到
                 draw_text_on_image(f"action:{original_action}", param, original_screenshot_path,f"./img_mark_log/{tid}/{timestamp}.jpg")
             elif action_type == "type" and isinstance(param, str):

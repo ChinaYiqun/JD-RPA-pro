@@ -4,4 +4,5 @@ paddleocr==2.8.1
 fastapi
 uvicorn
 pymongo
+autogui
 # -i https://pypi.tuna.tsinghua.edu.cn/simple/
