@@ -3,14 +3,26 @@
 
 from client import test_plan_action
 task_prompt = '''
-用户原始命令为：将客户转接给指定组，在‘指定咨询组’栏下，双击需要转接的‘兜底咨询组’。
+将客户转接给指定组，在‘指定咨询组’栏下，双击需要转接的‘兜底咨询组’。
 参考操作步骤为:
-    第1步：点击‘指定咨询组’，
-    第2步：必须找到‘兜底咨询组’  字样，并双击‘兜底咨询组’；
-    第3步：完成以上动作后，如果窗口显示‘成功转给其他同事’，
-    任务完成，在terminate里面status为success;
-    若显示转接失败，关闭转接窗口，在terminate里面status为 failure'
+第1步：点击‘指定咨询组’，返回action为'left_click'，coordinate为[x, y]；
+第2步：必须找到‘兜底咨询组’  字样，并双击‘兜底咨询组’，返回action为'double_click'，coordinate为[x, y]；
+第3步：完成以上动作后，如果窗口显示‘成功转给其他同事’，任务完成，在terminate里面status为"success";若显示转接失败，关闭转接窗口，在terminate里面status为"failure"。
+按照如下格式返回动作：
+<tool_call>
+{"name": "computer_use", "arguments": {"action": "left_click", "coordinate": [x, y]}}
+</tool_call>
+或者
+<tool_call>
+{"name": "computer_use", "arguments": {"action": "double_click", "coordinate": [x, y]}}
+</tool_call>
+或者
+<tool_call>
+{"name": "computer_use", "arguments": {"action": "terminate", "status": "success"}}
+</tool_call>
 '''
 
 test_plan_action(r"../assert/transfer_step_1.png",task_prompt)
 test_plan_action(r"../assert/transfer_step_2.png", task_prompt)
+# 返回terminate
+test_plan_action(r"../assert/transfer_step_success.png",task_prompt)

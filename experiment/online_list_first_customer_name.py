@@ -2,11 +2,16 @@
 from client import test_plan_action
 task_prompt = '''
 不进行任何操作，返回在线咨询列表中第一位顾客的名字，
-返回顾客的名字，在answer里面text为第一个用户的名称。
+返回action为'answer'，text为第一个用户的名称。如果成功返回用户名称，返回action为'terminate'，status为'success'。
 格式参考
  <tool_call>
 {"name": "computer_use", "arguments": {"action": "answer", "text": "第一个用户的名称"}}
 </tool_call>
-
+或者
+<tool_call>
+{"name": "computer_use", "arguments": {"action": "terminate", "status": "success"}}
+</tool_call>
 '''
+test_plan_action(r"../assert/online_list_first_customer_name.png",task_prompt)
+# 返回terminate 
 test_plan_action(r"../assert/online_list_first_customer_name.png",task_prompt)
