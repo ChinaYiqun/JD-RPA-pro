@@ -1,3 +1,5 @@
+import os
+import sys
 import time
 import json
 import requests
@@ -8,6 +10,9 @@ from io import BytesIO
 import tkinter as tk
 from tkinter import ttk
 
+
+
+
 def capture_screenshot():
     """捕获屏幕截图并转换为base64编码"""
     screenshot = ImageGrab.grab()
@@ -16,9 +21,25 @@ def capture_screenshot():
     return base64.b64encode(buffer.getvalue()).decode()
 
 
-def execute_automation_loop(default_task="点击界面中的'聊天记录/顾客'搜索栏",
+def execute_automation_loop(default_task=r'''
+用户原始命令为：Step1 界面右侧的“查询补贴资格”，Step 2 关闭弹窗 Step3 停止任务
+如果有这样的按钮返回action为'left_click'，coordinate为[x, y]；
+判断是点击成功，若点击返回action为'terminate'，status为'success'。有任何执行失败返回action为'terminate'，status为'failure'。
+按照如下格式返回动作：
+<tool_call>
+{"name": "computer_use", "arguments": {"action": "left_click", "coordinate": [x, y]}}
+</tool_call>
+或者
+<tool_call>
+{"name": "computer_use", "arguments": {"action": "terminate", "status": "success"}}
+</tool_call>
+
+
+
+''',
                             max_loops=10,
                             tid = f"default_task_{int(time.time())}"  ):
+    # {int(time.time())}
     """
     执行自动化循环
 
@@ -78,7 +99,7 @@ def execute_automation_loop(default_task="点击界面中的'聊天记录/顾客
                 break
 
             # 等待动作执行完成
-            time.sleep(1)
+            time.sleep(3)
     except Exception as e:
         print(f"执行过程中发生异常: {str(e)}")
         execution_success = False
@@ -121,11 +142,47 @@ def execute_automation_loop(default_task="点击界面中的'聊天记录/顾客
 
 
 if __name__ == "__main__":
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(current_dir)
+    sys.path.insert(0, parent_dir)
 
-    # 最小化窗口
+    # ================= 已经在业务流程里面的TASK  =================#
+    # click_search.py [ok]
+    # hangup2reception.py [ok]
+    # hangup_click_frist_message.py [ok]
+    # pop_up_close.py
+    # reception2hangup.py [ok]
+    # reception_click_frist_message.py [ok]
+    # transfer.py [ok]
+    # search_first_customer.py [ok]
+    # online_list_first_customer_name.py [ok]
+
+    # from test import taskConfig, get_task_by_phase
+    # result = taskConfig()
+    # tasks = result.get("result", {}).get("tasks", [])
+    # target_phase = "reception_click_frist_message"
+    # task_prompt = get_task_by_phase(tasks, target_phase)
+
+    # ================= 不在业务流程里面的TASK  =================#
+    from dataset_generate.other_tasks import tasks_dict
+    # open_merchant_backend [ok]
+    # open_data_table [ok]
+    # list_product [ok]
+    # delist_product [ok]
+    # check_new_message_in_online_consultation [ok]
+    # click_i_know_right_panel [ok]
+    # click_service_order_and_input [ok]
+    # click_phone_and_close_popup [ok]
+    # toggle_layout_compact_to_normal [ok]
+    # select_enter_to_send_message [ok]
+    # click_check_subsidy_and_close [ok]
+
+    target_phase = "open_robot_chat"
+    task_prompt = tasks_dict[target_phase]
+
     import pygetwindow as gw
     current_window = gw.getActiveWindow()
     if current_window:
         current_window.minimize()
     time.sleep(3)
-    execute_automation_loop(max_loops=10)
+    execute_automation_loop(default_task = task_prompt,max_loops=10,tid=f"yq_{target_phase}")

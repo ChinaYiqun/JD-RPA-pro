@@ -12,6 +12,8 @@ class ResultModel(BaseModel):
     result: Optional[Dict] = None
 
 
+
+
 def get_config():
     file_path = "configs/task/20251105-3.json"
     try:
@@ -28,6 +30,15 @@ def get_config():
         # 读取配置文件内容
         with open(file_path, "r", encoding="utf-8") as f:
             task_data = json.load(f)
+
+        if "tasks" in task_data and isinstance(task_data["tasks"], list):
+
+            for task_item in task_data["tasks"]:
+                if isinstance(task_item, dict) and "task" in task_item and isinstance(task_item["task"], str):
+                    task_item["task"] = task_item["task"].replace('\\"', '"')
+
+
+
 
         # 构建响应结构
         return ResultModel(

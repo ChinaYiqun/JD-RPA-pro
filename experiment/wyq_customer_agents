@@ -1,0 +1,123 @@
+用户原始命令为：判断左侧在线咨询下面是否有新消息
+如果有这样的窗口返回action为'left_click'，coordinate为[x, y]；
+判断是点击成功，若点击返回action为'terminate'，status为'success'。有任何执行失败返回action为'terminate'，status为'failure'。
+按照如下格式返回动作：
+<tool_call>
+{"name": "computer_use", "arguments": {"action": "left_click", "coordinate": [x, y]}}
+</tool_call>
+或者
+<tool_call>
+{"name": "computer_use", "arguments": {"action": "terminate", "status": "success"}}
+</tool_call>
+
+
+
+用户原始命令为：点击界面右侧的“我知道了”
+如果有这样的按钮返回action为'left_click'，coordinate为[x, y]；
+判断是点击成功，若点击返回action为'terminate'，status为'success'。有任何执行失败返回action为'terminate'，status为'failure'。
+按照如下格式返回动作：
+<tool_call>
+{"name": "computer_use", "arguments": {"action": "left_click", "coordinate": [x, y]}}
+</tool_call>
+或者
+<tool_call>
+{"name": "computer_use", "arguments": {"action": "terminate", "status": "success"}}
+</tool_call>
+
+
+
+用户原始命令为：点击界面右侧的“我知道了”
+如果有这样的按钮返回action为'left_click'，coordinate为[x, y]；
+判断是点击成功，若点击返回action为'terminate'，status为'success'。有任何执行失败返回action为'terminate'，status为'failure'。
+按照如下格式返回动作：
+<tool_call>
+{"name": "computer_use", "arguments": {"action": "left_click", "coordinate": [x, y]}}
+</tool_call>
+或者
+<tool_call>
+{"name": "computer_use", "arguments": {"action": "terminate", "status": "success"}}
+</tool_call>
+
+
+
+用户原始命令为：Step1 点击界面右侧的服务单，Step 2 再点击请输入服务单编号
+如果有这样的按钮返回action为'left_click'，coordinate为[x, y]；
+判断是点击成功，若点击返回action为'terminate'，status为'success'。有任何执行失败返回action为'terminate'，status为'failure'。
+按照如下格式返回动作：
+<tool_call>
+{"name": "computer_use", "arguments": {"action": "left_click", "coordinate": [x, y]}}
+</tool_call>
+或者
+<tool_call>
+{"name": "computer_use", "arguments": {"action": "terminate", "status": "success"}}
+</tool_call>
+
+
+
+
+用户原始命令为：Step1 点击界面中的电话按钮，Step 2 关闭弹窗 Step3 停止任务
+如果有这样的按钮返回action为'left_click'，coordinate为[x, y]；
+判断是点击成功，若点击返回action为'terminate'，status为'success'。有任何执行失败返回action为'terminate'，status为'failure'。
+按照如下格式返回动作：
+<tool_call>
+{"name": "computer_use", "arguments": {"action": "left_click", "coordinate": [x, y]}}
+</tool_call>
+或者
+<tool_call>
+{"name": "computer_use", "arguments": {"action": "terminate", "status": "success"}}
+</tool_call>
+
+
+
+用户原始命令为：Step1 点击界面左上方的时钟按钮，Step 2 点击最近咨询 Step3 停止任务
+如果有这样的按钮返回action为'left_click'，coordinate为[x, y]；
+判断是点击成功，若点击返回action为'terminate'，status为'success'。有任何执行失败返回action为'terminate'，status为'failure'。
+按照如下格式返回动作：
+<tool_call>
+{"name": "computer_use", "arguments": {"action": "left_click", "coordinate": [x, y]}}
+</tool_call>
+或者
+<tool_call>
+{"name": "computer_use", "arguments": {"action": "terminate", "status": "success"}}
+</tool_call>
+
+
+
+用户原始命令为：Step1 点击界面左紧凑布局，Step 2 点击最近常规布局 Step3 停止任务
+如果有这样的按钮返回action为'left_click'，coordinate为[x, y]；
+判断是点击成功，若点击返回action为'terminate'，status为'success'。有任何执行失败返回action为'terminate'，status为'failure'。
+按照如下格式返回动作：
+<tool_call>
+{"name": "computer_use", "arguments": {"action": "left_click", "coordinate": [x, y]}}
+</tool_call>
+或者
+<tool_call>
+{"name": "computer_use", "arguments": {"action": "terminate", "status": "success"}}
+</tool_call>
+
+
+用户原始命令为：Step1 点击发送按钮下侧的下拉选项，Step 2 选择按Enter 发送消息 Step3 停止任务
+如果有这样的按钮返回action为'left_click'，coordinate为[x, y]；
+判断是点击成功，若点击返回action为'terminate'，status为'success'。有任何执行失败返回action为'terminate'，status为'failure'。
+按照如下格式返回动作：
+<tool_call>
+{"name": "computer_use", "arguments": {"action": "left_click", "coordinate": [x, y]}}
+</tool_call>
+或者
+<tool_call>
+{"name": "computer_use", "arguments": {"action": "terminate", "status": "success"}}
+</tool_call>
+
+
+
+用户原始命令为：Step1 界面右侧的“查询补贴资格”，Step 2 关闭弹窗 Step3 停止任务
+如果有这样的按钮返回action为'left_click'，coordinate为[x, y]；
+判断是点击成功，若点击返回action为'terminate'，status为'success'。有任何执行失败返回action为'terminate'，status为'failure'。
+按照如下格式返回动作：
+<tool_call>
+{"name": "computer_use", "arguments": {"action": "left_click", "coordinate": [x, y]}}
+</tool_call>
+或者
+<tool_call>
+{"name": "computer_use", "arguments": {"action": "terminate", "status": "success"}}
+</tool_call>

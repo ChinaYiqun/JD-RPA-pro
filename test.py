@@ -1,5 +1,7 @@
 import base64
 import json
+import time
+
 import requests
 import os
 
@@ -16,7 +18,7 @@ def taskConfig(api_url=API_HOST + "/api/lam/taskConfig"):
         response = requests.get(api_url)
         result = response.json()
         print(json.dumps(result, indent=4, ensure_ascii=False))
-
+        return result
     except requests.exceptions.RequestException as e:
         print(f"请求发生错误: {str(e)}")
     except json.JSONDecodeError as e:
@@ -42,7 +44,7 @@ def test_plan_action(image_path, task_prompt,api_url=API_HOST + "/api/lam/planAc
         # 2. 构造请求参数
         request_data = {
             "uid": "test_user_123",
-            "tid": "task_456",
+            "tid": "task_456"+str(time.time()),
             "task": task_prompt,  #
             "language": "中文",
             "image": base64_image
@@ -56,6 +58,7 @@ def test_plan_action(image_path, task_prompt,api_url=API_HOST + "/api/lam/planAc
         result = response.json()
         print("接口响应结果:")
         print(json.dumps(result, indent=4, ensure_ascii=False))
+        return result
 
     except requests.exceptions.RequestException as e:
         print(f"请求发生错误: {str(e)}")
@@ -64,6 +67,13 @@ def test_plan_action(image_path, task_prompt,api_url=API_HOST + "/api/lam/planAc
     except Exception as e:
         print(f"处理过程发生错误: {str(e)}")
 
+def get_task_by_phase(tasks, target_phase):
+    """根据phase获取对应的task内容"""
+    for task in tasks:
+        if task.get("phase") == target_phase:
+            return task.get("task")
+    return None  # 如果未找到返回None
 
-
-taskConfig()
+# result = taskConfig()
+# tasks = result.get("result", {}).get("tasks", [])
+# search_first_customer = get_task_by_phase(tasks,"search_first_customer")

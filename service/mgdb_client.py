@@ -43,6 +43,7 @@ class MongoDBClient:
     def clear_history(self, tid):
         """删除指定任务ID的历史记录"""
         result = self.collection.delete_one({'tid': tid})
+        print(f"🗑️ 已删除任务ID {tid} 的历史记录，共删除 {result.deleted_count} 条记录")
         return result.deleted_count > 0  # 返回是否成功删除（True表示存在并删除，False表示不存在）
 
     def clear_all_history(self):
@@ -57,3 +58,11 @@ class MongoDBClient:
         result = self.collection.delete_many({"tid": {"$regex": "^tmp__"}})
         print(f"🗑️ 已清空tmp前缀临时记录，共删除 {result.deleted_count} 条记录")
         return result.deleted_count  # 返回删除的记录数
+
+    # 根据前缀名查询所有历史记录
+    def query_history_by_prefix(self, prefix):
+        """查询所有tid以指定前缀开头的历史记录"""
+        cursor = self.collection.find({"tid": {"$regex": f"^{prefix}"}})
+        # 返回一个dict ,key 为tid ，value 为  doc.get('history', []) 的值
+        return {doc['tid']: doc.get('history', []) for doc in cursor}
+

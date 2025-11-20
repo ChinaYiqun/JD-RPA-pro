@@ -40,6 +40,7 @@ async def plan_action(request: PlanActionRequest):
 
 
 if __name__ == '__main__':
+    # todo type 类型解析报错！！！！
     #uvicorn main:app --host 0.0.0.0 --port 6666 --reload
     mg = MongoDBClient()
     mg.clear_tmp_history()

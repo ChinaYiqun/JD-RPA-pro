@@ -63,6 +63,8 @@ REMOTE_CONFIG = {
 
 # 当前使用的远程模型名称（必须是 REMOTE_CONFIG 中的 key）
 CURRENT_REMOTE_MODEL = "openrouter-qwen3vl-8b"
+CURRENT_REMOTE_MODEL = "dashscope-qwen3vl-plus"
+
 
 # =========================== 自动选择配置 ======================= #
 if USE_LOCAL_MODEL:
