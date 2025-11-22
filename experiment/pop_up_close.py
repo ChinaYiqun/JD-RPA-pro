@@ -15,5 +15,5 @@ task_prompt = '''
 </tool_call>
 '''
 test_plan_action(r"../assert/pop_up_close.png",task_prompt)
-# 返回terminate
-test_plan_action(r"../assert/pop_up_close.png",task_prompt)
+# # 返回terminate
+# test_plan_action(r"../assert/pop_up_close.png",task_prompt)

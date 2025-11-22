@@ -19,6 +19,8 @@ class MongoDBClient:
             self.client.admin.command('ping')  # 验证连接
             self.db = self.client[db_name]
             self.collection = self.db[collection_name]
+            # 检查并创建tid字段的索引（如果不存在）
+            self.collection.create_index("tid", background=True)  # background=True 表示后台创建，不阻塞其他操作
             print(f"✅ 成功连接到MongoDB: {host}:{port}/{db_name}.{collection_name}")
         except ConnectionFailure:
             print(f"❌ MongoDB连接失败: {host}:{port}")
@@ -66,3 +68,26 @@ class MongoDBClient:
         # 返回一个dict ,key 为tid ，value 为  doc.get('history', []) 的值
         return {doc['tid']: doc.get('history', []) for doc in cursor}
 
+    def get_document_count(self):
+        """获取集合中所有文档的总数"""
+        return self.collection.count_documents({})
+
+    def get_total_data_size_mb(self):
+        """获取集合中所有文档的总数据大小（MB）"""
+        # 获取集合统计信息
+        stats = self.db.command("collstats", self.collection.name)
+        # 提取文档数据总大小（字节），默认为0
+        data_size_bytes = stats.get("size", 0)
+        # 转换为MB（1MB = 1024*1024字节）并保留两位小数
+        data_size_mb = round(data_size_bytes / (1024 * 1024), 2)
+        return data_size_mb
+
+    # todo ttl 过期机制
+
+
+    # todo 使用定时任务（Cron + Python）定期查询过期数据/ 同步到hdfs中持久化
+
+if __name__ == '__main__':
+    mg = MongoDBClient()
+    print(mg.get_document_count())
+    print(mg.get_total_data_size_mb())

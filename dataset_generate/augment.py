@@ -222,17 +222,17 @@ if __name__ == "__main__":
         print("\n" + "="*50 + "\n")
         prompt_variants_json = prompt_variants(history_data, n=1)
 
-        for i, prompt_variant in enumerate(prompt_variants_json):
-            with open(os.path.join(save_dir, f"{history_id}_prompt_variants{i}.json"), "w", encoding="utf-8") as f:
-                json.dump(prompt_variant, f, ensure_ascii=False, indent=4)
+        # for i, prompt_variant in enumerate(prompt_variants_json):
+        #     with open(os.path.join(save_dir, f"{history_id}_prompt_variants{i}.json"), "w", encoding="utf-8") as f:
+        #         json.dump(prompt_variant, f, ensure_ascii=False, indent=4)
+        #
+        #     pic_variants_json = pic_variants(history_data, n=2)
+        #     for j, pic_variant in enumerate(pic_variants_json):
+        #         with open(os.path.join(save_dir, f"{history_id}_pic_variants{i}_{j}.json"), "w", encoding="utf-8") as f:
+        #             json.dump(pic_variant, f, ensure_ascii=False, indent=4)
 
-            pic_variants_json = pic_variants(history_data, n=2)
-            for j, pic_variant in enumerate(pic_variants_json):
-                with open(os.path.join(save_dir, f"{history_id}_pic_variants{i}_{j}.json"), "w", encoding="utf-8") as f:
-                    json.dump(pic_variant, f, ensure_ascii=False, indent=4)
-
-                position_variants_json = position_variants(pic_variant, n=2, pixel=2)
-                for k, variant in enumerate(position_variants_json):
-                    with open(os.path.join(save_dir, f"{history_id}_position_variants{i}_{j}_{k}.json"), "w", encoding="utf-8") as f:
-                        json.dump(variant, f, ensure_ascii=False, indent=4)
+                # position_variants_json = position_variants(pic_variant, n=1, pixel=2)
+                # for k, variant in enumerate(position_variants_json):
+                #     with open(os.path.join(save_dir, f"{history_id}_position_variants{i}_{j}_{k}.json"), "w", encoding="utf-8") as f:
+                #         json.dump(variant, f, ensure_ascii=False, indent=4)
 
