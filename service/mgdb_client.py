@@ -37,7 +37,8 @@ class MongoDBClient:
             {'tid': tid},
             {'$set': {
                 'history': history,
-                'updated_at': datetime.datetime.now()
+                'updated_at': datetime.datetime.now(),
+                'expire_at': datetime.datetime.now() + datetime.timedelta(hours=72)
             }},
             upsert=True
         )
@@ -82,10 +83,94 @@ class MongoDBClient:
         data_size_mb = round(data_size_bytes / (1024 * 1024), 2)
         return data_size_mb
 
-    # todo ttl 过期机制
+    def migrate_collection(self, new_collection_name, copy_indexes=True, verify_migration=True):
+        """
+        将当前集合（默认task_history）的数据迁移到新集合
 
+        参数:
+            new_collection_name: 新集合名称（字符串）
+            copy_indexes: 是否复制原集合的索引到新集合（默认True）
+            verify_migration: 是否验证迁移结果（默认True）
 
-    # todo 使用定时任务（Cron + Python）定期查询过期数据/ 同步到hdfs中持久化
+        返回:
+            dict: 迁移结果，包含原集合名、新集合名、迁移文档数、验证结果（如果开启）
+        """
+        # 1. 检查新集合是否存在，不存在则创建（MongoDB会自动创建，此处仅打印提示）
+        if new_collection_name not in self.db.list_collection_names():
+            print(f"📁 新集合 '{new_collection_name}' 不存在，将自动创建")
+        else:
+            print(f"📁 新集合 '{new_collection_name}' 已存在，数据将追加（如需覆盖请先手动删除）")
+
+        # 2. 迁移数据：使用聚合管道的$out操作（原子性强，效率高）
+        try:
+            print(f"🚀 开始迁移数据：从 '{self.collection.name}' 到 '{new_collection_name}'")
+            # $out会自动创建新集合，若已存在则追加数据
+            migration_result = self.collection.aggregate([
+                {"$out": new_collection_name}
+            ])
+            # 聚合管道无返回结果，需通过计数验证迁移数量
+            migrated_count = self.db[new_collection_name].count_documents({})
+            print(f"✅ 数据迁移完成，新集合共 {migrated_count} 条文档")
+
+        except Exception as e:
+            print(f"❌ 数据迁移失败：{str(e)}")
+            raise
+
+        # 3. 复制索引（如需保留原索引结构）
+        if copy_indexes:
+            print(f"🔍 开始复制原集合 '{self.collection.name}' 的索引到新集合")
+            try:
+                # 获取原集合的所有索引（排除默认的_id索引，MongoDB会自动为新集合创建）
+                indexes = self.collection.index_information()
+                index_count = 0
+                for idx_name, idx_info in indexes.items():
+                    if idx_name == '_id_':  # 跳过默认_id索引
+                        continue
+                    # 复制索引（保留原索引参数，如background、unique等）
+                    self.db[new_collection_name].create_index(
+                        idx_info['key'],
+                        name=idx_name,
+                        background=idx_info.get('background', False),
+                        unique=idx_info.get('unique', False),
+                        sparse=idx_info.get('sparse', False)
+                    )
+                    index_count += 1
+                print(f"✅ 索引复制完成，共复制 {index_count} 个索引")
+            except Exception as e:
+                print(f"⚠️  索引复制失败：{str(e)}，但数据迁移已完成")
+
+        # 4. 验证迁移结果（可选）
+        verification_result = True
+        if verify_migration:
+            print(f"🔧 开始验证迁移结果")
+            original_count = self.collection.count_documents({})
+            new_count = self.db[new_collection_name].count_documents({})
+            # 验证迁移数量是否匹配（若新集合原有数据，此处会不相等，属于正常情况）
+            if original_count == new_count:
+                print(f"✅ 迁移验证通过：原集合 {original_count} 条，新集合 {new_count} 条（数量完全匹配）")
+            else:
+                print(
+                    f"⚠️  迁移验证警告：原集合 {original_count} 条，新集合 {new_count} 条（数量不匹配，可能新集合原有数据）")
+                verification_result = False
+
+        # 5. 删除原集合数据（迁移完成后清空）
+        try:
+            print(f"🗑️ 开始删除原集合 '{self.collection.name}' 的数据")
+            delete_result = self.collection.delete_many({})
+            print(f"✅ 原集合数据删除完成，共删除 {delete_result.deleted_count} 条文档")
+        except Exception as e:
+            print(f"❌ 原集合数据删除失败：{str(e)}，请手动清理")
+            raise
+
+        # 6. 返回迁移结果
+        return {
+            "original_collection": self.collection.name,
+            "new_collection": new_collection_name,
+            "migrated_document_count": migrated_count,
+            "indexes_copied": copy_indexes,
+            "verification_passed": verification_result
+        }
+
 
 if __name__ == '__main__':
     mg = MongoDBClient()
