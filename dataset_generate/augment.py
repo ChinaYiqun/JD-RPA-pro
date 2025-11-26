@@ -47,23 +47,32 @@ def prompt_variants(original_json, n = 5):
             if user_msg is not None:
                 break
 
+# - 保持动作（例如，点击、输入、滚动）和目标（例如，按钮名称、位置）。
+# - 变换措辞、词序、语态（主动/被动）、同义词。
+# - 不要改变意义，也不要增删步骤。
     # 3. 调用 LLM 生成 n 个改写版本
-    instruction = f"""给定原始的计算机代理指令："{original_instruct}"
-生成 {n} 个多样但语义等效的改写。
-- 保持动作（例如，点击、输入、滚动）和目标（例如，按钮名称、位置）。
-- 变换措辞、词序、语态（主动/被动）、同义词。
-- 不要改变意义，也不要增删步骤。
+    instruction = f"""你是一个专业 prompt 改写工具。请对以下用户指令生成 {n} 个同义改写版本。
 
-输出格式：仅 JSON 字符串列表。
+原始指令：
+{original_instruct}
+
+要求：
+- 严格保持原意，包括所有操作步骤、目标元素及末尾的格式要求（例如“按照如下格式返回动作：<tool_call>...<tool_call>”必须完整保留）。
+- 字符串中若包含双引号（如 JSON 片段中的 "name"），必须转义为 \\"name\\"；反斜杠必须转义为 \\\\。
+- 只改变对任务叙述内容的改写，规定的模型回复格式不要做任何删减修改。例如:按照如下格式返回动作:<tool_call>...</tool_call>这部分内容应该保留
+- 输出必须是严格的 JSON 格式：一个字符串数组，如 ["改写1", "改写2", ...]
+
+输出格式：仅 JSON 字符串列表。 
 示例： ["点击右下角的 '提交' 按钮。", ...]
 """
+    # print("instruction:", instruction)
     # 调用 LLM
     client = OpenAI(
         base_url=base_url,
         api_key=api_key,
     )
     messages = [
-                {"role": "system", "content": [{"type": "text", "text": "你是一位擅长对提示词进行改写的助手。"}]},
+                {"role": "system", "content": [{"type": "text", "text": "你是一位擅长对用户的prompt进行改写的助手。"}]},
                 {"role": "user", "content": instruction}
             ]
     chat_completion = client.chat.completions.create(
@@ -74,8 +83,15 @@ def prompt_variants(original_json, n = 5):
         tool_choice="none",
     )
     variants = chat_completion.choices[0].message.content    
+    # print("原始模型输出:", variants)
     variants = json.loads(variants)  
-    print("原始模型输出:\n", variants)
+
+    # 保证instruct包含<tool_call>格式要求： 
+    for var_text in variants:
+        if parse_tool_call(var_text) is None:
+            var_text = var_text + " 按照如下格式返回动作：" + parse_tool_call(original_instruct)
+
+    # 保证生成的指令数量不小于 n
     if len(variants) < n:
         # 若生成不足 n 条，用原始指令补足
         variants += [original_instruct] * (n - len(variants))
@@ -122,13 +138,12 @@ def pic_variants(original_json, n=5):
                 for block in msg["content"]:
                     if block["type"] == "image_url":
                         url = block["image_url"]["url"]
-                        origin_size = block.get("origin_size", [1920, 1080])
-                        orig_w, orig_h = origin_size
                         # 独立处理这张图 
                         # 1. 解码
                         b64_data = url.split(",", 1)[1]
                         img_bytes = base64.b64decode(b64_data)
                         img = Image.open(BytesIO(img_bytes)).convert("RGB")
+                        orig_w, orig_h = img.size
                         
                         # 2. resize 到目标分辨率（拉伸）
                         resized = img.resize((target_w, target_h))
@@ -206,12 +221,20 @@ if __name__ == "__main__":
     #history_sample = client.get_history(name)
 
     # 返回的每个json保存到当前 save 目录下
-    save_dir = r"D:\pycharmProject\dataset\save\save" #os.path.join(os.path.dirname(__file__), "save")
+    # save_dir = r"D:\pycharmProject\dataset\save\save" #os.path.join(os.path.dirname(__file__), "save")
+    save_dir = r"C:\lenovo_sx\JD-RPA-pro\save"
     os.makedirs(save_dir, exist_ok=True)
 
-
     query_history_by_prefix = client.query_history_by_prefix("yq_")
+    # import json
+    # for history_id, json_file in query_history_by_prefix.items():
+    #     for message in json_file:
+    #         with open(os.path.join(save_dir, f"{history_id}.json"), "w", encoding="utf-8") as f:
+    #             json.dump(json_file, f, ensure_ascii=False, indent=4)
+    #         if message["role"] == "user":
+    #             message['content'][0]['image_url']['url'] = "test"
     print(f"query_history_by_prefix:{query_history_by_prefix}")
+    print(f"len(query_history_by_prefix):{len(query_history_by_prefix)}")
 
     from tqdm import tqdm
     for history_id, history_data in tqdm(query_history_by_prefix.items(), desc="Processing histories"):
@@ -220,7 +243,7 @@ if __name__ == "__main__":
         with open(os.path.join(save_dir, f"{history_id}.json"), "w", encoding="utf-8") as f:
             json.dump(history_data, f, ensure_ascii=False, indent=4)
         print("\n" + "="*50 + "\n")
-        prompt_variants_json = prompt_variants(history_data, n=1)
+        prompt_variants_json = prompt_variants(history_data, n=2)
 
         # for i, prompt_variant in enumerate(prompt_variants_json):
         #     with open(os.path.join(save_dir, f"{history_id}_prompt_variants{i}.json"), "w", encoding="utf-8") as f:
