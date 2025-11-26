@@ -154,6 +154,24 @@ def process_request(request: PlanActionRequest) -> PlanActionResponse:
                 content = param
             elif action_type == "finished":
                 content = param
+    if action_type == "type":
+        return PlanActionResponse(
+            status=0,
+            httpCode=200,
+            message="OK",
+            result=ResultData(
+                status="FINISH",
+                answer=Answer(
+                    actionType=action_type,
+                    actionInputs=ActionInputs(
+                        content=content,
+                    ),
+                    boxArgs=[],
+                    otherArgs=[]
+                )
+            )
+        )
+
     if action_type in ["click", "double_click"]:
         return PlanActionResponse(
             status=0,

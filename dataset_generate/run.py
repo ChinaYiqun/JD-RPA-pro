@@ -157,14 +157,14 @@ if __name__ == "__main__":
     # search_first_customer.py [ok]
     # online_list_first_customer_name.py [ok]
 
-    # from test import taskConfig, get_task_by_phase
-    # result = taskConfig()
-    # tasks = result.get("result", {}).get("tasks", [])
-    # target_phase = "reception_click_frist_message"
-    # task_prompt = get_task_by_phase(tasks, target_phase)
+    from test import taskConfig, get_task_by_phase
+    result = taskConfig()
+    tasks = result.get("result", {}).get("tasks", [])
+    target_phase = "hangup2reception"
+    task_prompt = get_task_by_phase(tasks, target_phase)
 
     # ================= 不在业务流程里面的TASK  =================#
-    from dataset_generate.other_tasks import tasks_dict
+    # from dataset_generate.other_tasks import tasks_dict
     # open_merchant_backend [ok]
     # open_data_table [ok]
     # list_product [ok]
@@ -177,12 +177,12 @@ if __name__ == "__main__":
     # select_enter_to_send_message [ok]
     # click_check_subsidy_and_close [ok]
 
-    target_phase = "open_robot_chat"
-    task_prompt = tasks_dict[target_phase]
+    # target_phase = "hangup2reception"
+    # task_prompt = tasks_dict[target_phase]
 
     import pygetwindow as gw
     current_window = gw.getActiveWindow()
     if current_window:
         current_window.minimize()
     time.sleep(3)
-    execute_automation_loop(default_task = task_prompt,max_loops=10,tid=f"yq_{target_phase}")
+    execute_automation_loop(default_task = task_prompt,max_loops=10,tid=f"tmp_{target_phase}+{time.time()}")
