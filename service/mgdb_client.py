@@ -58,7 +58,7 @@ class MongoDBClient:
     def clear_tmp_history(self):
         """删除前缀为'tmp__'的临时任务历史记录"""
         # 使用正则表达式匹配tid以"tmp__"开头的文档
-        result = self.collection.delete_many({"tid": {"$regex": "^tmp__"}})
+        result = self.collection.delete_many({"tid": {"$regex": "^tmp"}})
         print(f"🗑️ 已清空tmp前缀临时记录，共删除 {result.deleted_count} 条记录")
         return result.deleted_count  # 返回删除的记录数
 

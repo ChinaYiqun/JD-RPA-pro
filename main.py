@@ -30,6 +30,7 @@ def get_task_config():
 
 @app.post("/api/lam/planAction")
 async def plan_action(request: PlanActionRequest):
+    logging.info(f"request.tid: {request.tid}, request.task: {request.task}")
     result = None
     if is_ocr_task(request):
         result = process_ocr_request(request)
