@@ -43,12 +43,12 @@ def test_plan_action(image_path, task_prompt,api_url=API_HOST + "/api/lam/planAc
         # 2. 构造请求参数
         request_data = {
             "uid": "test_user_123",
-            "tid": "tmp__" + datetime.datetime.now().strftime("%Y%m%d%H%M%S"),
+            "tid": "tmp__",
             "task": task_prompt,  # 首次调用必填
             "language": "中文",
             "image": base64_image
         }
-
+        print(f"tid: {request_data['tid']}")
         # 3. 发送POST请求
         response = requests.post(api_url, json=request_data)
         response.raise_for_status()  # 检查HTTP错误状态码
