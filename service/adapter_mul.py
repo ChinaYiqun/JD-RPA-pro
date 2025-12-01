@@ -63,7 +63,7 @@ def parser_action(content: str, image_path: str) -> tuple:
                 if not action:
                     continue
                 # todo
-                if action in ['left_click', 'right_click', 'mouse_move', 'double_click']:
+                if action in ['click','left_click', 'right_click', 'mouse_move', 'double_click']:
                     coordinate = data['arguments'].get('coordinate')
                     if isinstance(coordinate, list) and len(coordinate) == 2:
                         x, y = coordinate

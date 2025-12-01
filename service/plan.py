@@ -124,6 +124,8 @@ def process_request(request: PlanActionRequest) -> PlanActionResponse:
             action_type = "click"
         elif original_action =="double_click":
             action_type = "double_click"
+        elif original_action =="right_click":
+            action_type = "right_click"
         elif original_action == "type":
             action_type = "type"
         elif original_action == "key":
@@ -139,7 +141,7 @@ def process_request(request: PlanActionRequest) -> PlanActionResponse:
         # 参数解析
         if param_list and len(param_list) > 0:
             param = param_list[0]
-            if action_type in ["click", "double_click"] and isinstance(param, tuple) and len(param) == 2:
+            if action_type in ["click", "double_click","left_click","right_click"] and isinstance(param, tuple) and len(param) == 2:
                 # 坐标转换为字符串格式
                 box_args = [str(param[0]), str(param[1])]
                 # 将坐标绘制到
@@ -172,7 +174,7 @@ def process_request(request: PlanActionRequest) -> PlanActionResponse:
             )
         )
 
-    if action_type in ["click", "double_click"]:
+    if action_type in ["click", "double_click","left_click","right_click"] :
         return PlanActionResponse(
             status=0,
             httpCode=200,
