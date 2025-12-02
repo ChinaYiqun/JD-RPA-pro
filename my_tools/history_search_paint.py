@@ -182,4 +182,5 @@ with gr.Blocks(title="任务历史记录查看器") as demo:
     )
 
 if __name__ == "__main__":
-    demo.launch(share=False, debug=True)
+
+    demo.launch(share=False, debug=True, server_name="0.0.0.0")

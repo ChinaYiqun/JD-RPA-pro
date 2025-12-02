@@ -221,8 +221,8 @@ if __name__ == "__main__":
     #history_sample = client.get_history(name)
 
     # 返回的每个json保存到当前 save 目录下
-    # save_dir = r"D:\pycharmProject\dataset\save\save" #os.path.join(os.path.dirname(__file__), "save")
-    save_dir = r"C:\lenovo_sx\JD-RPA-pro\save"
+    save_dir = r"D:\pycharmProject\dataset\save\save" #os.path.join(os.path.dirname(__file__), "save")
+    #save_dir = r"C:\lenovo_sx\JD-RPA-pro\save"
     os.makedirs(save_dir, exist_ok=True)
 
     query_history_by_prefix = client.query_history_by_prefix("yq_")
