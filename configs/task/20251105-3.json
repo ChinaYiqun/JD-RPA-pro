@@ -49,7 +49,7 @@
         },
         {
             "phase": "reception_click_frist_message",
-            "task": "用户原始命令为：认真观察'在线咨询'的列表是否存在用户消息，点击第一个用户消息。\n参考操作步骤为:1.如果列表里面有用户消息，只需要点击第一个用户，返回action为'left_click'，coordinate为[x, y]。\n2.如果'在线咨询'的列表为空，不存在用户消息，返回action为'answer'，text为'无搜索结果'。\n3.判断是否完成任务，如果完成，返回action为'terminate'，status为'success'，否则返回action为'terminate'，status为'failure'。\n按照如下格式返回动作： \n<tool_call>\n{\"name\": \"computer_use\", \"arguments\": {\"action\": \"left_click\", \"coordinate\": [x, y]}}\n</tool_call>\n或者\n<tool_call>\n{\"name\": \"computer_use\", \"arguments\": {\"action\": \"answer\", \"text\": \"无搜索结果\"}}\n</tool_call>\n或者\n<tool_call>\n{\"name\": \"computer_use\", \"arguments\": {\"action\": \"terminate\", \"status\": \"success\"}}\n</tool_call>",
+            "task": "请认真观察左侧'在线咨询'列表中是否存在用户消息。\n\n执行步骤如下：\n1. 如果'在线咨询'面板尚未展开，请先点击该面板标题以展开；如果已展开，则跳过此步。\n2. 检查展开后的列表中是否存在用户消息（即有未读或历史会话）。\n   - 如果存在至少一条用户消息，请点击**第一个用户消息**。\n   - 如果列表为空（无任何用户消息），则不执行任何点击操作。\n\n判断与返回规则：\n- 若成功点击了第一个用户消息，请返回 terminate action 且 status 为 'success'。\n- 若列表为空，无用户消息，请返回 terminate action 且 status 为 'failure'。\n\n注意：仅执行一次点击操作（或不操作），无需循环处理多个消息。\n\n请严格按照以下格式返回动作：\n<tool_call>\n    {\"name\": \"computer_use\", \"arguments\": {\"action\": \"left_click\", \"coordinate\": [x, y]}}\n</tool_call>\n或\n<tool_call>\n    {\"name\": \"computer_use\", \"arguments\": {\"action\": \"terminate\", \"status\": \"success\"}}\n</tool_call>\n或\n<tool_call>\n    {\"name\": \"computer_use\", \"arguments\": {\"action\": \"terminate\", \"status\": \"failure\"}}\n<tool_call>",
             "maxLoop": 10
         },
         {

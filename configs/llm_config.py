@@ -1,12 +1,12 @@
 # =========================== 全局开关 =========================== #
 # 设置为 True 使用本地部署模型，False 使用在线 API
-USE_LOCAL_MODEL = False
+USE_LOCAL_MODEL = True
 
 # =========================== 本地模型配置 ======================= #
 LOCAL_CONFIG = {
-    # Qwen3-VL-8B-Instruct（部署在 GPU 2，端口 8888）
+    # Qwen3-VL-8B-Instruct
     "qwen3-vl-8b": {
-        "base_url": "http://127.0.0.1:8888/v1",
+        "base_url": "http://127.0.0.1:8123/v1",
         "api_key": "",  # 本地模型可以不需要 apikey
         "model": "/home/lenovo/Project/ModelDir/Qwen3-VL-8B-Instruct/"
     },
