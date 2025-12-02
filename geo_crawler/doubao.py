@@ -1,5 +1,9 @@
 import os
 import sys
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+sys.path.insert(0, parent_dir)
+
 import time
 import json
 import requests
@@ -16,10 +20,8 @@ MAX_AUTOMATION_LOOPS = 6
 SEARCH_WAIT_SECONDS = 60
 SCROLL_PAUSE_SECONDS = 1
 REFERENCE_LINK_COUNT = 3
+doubao_path = r"D:\Doubao\Doubao.exe"
 
-current_dir = os.path.dirname(os.path.abspath(__file__))
-parent_dir = os.path.dirname(current_dir)
-sys.path.insert(0, parent_dir)
 
 # Window initialization
 current_window = gw.getActiveWindow()
@@ -31,10 +33,13 @@ from common import *
 
 def run_automation_phase(target_phase, task_prompt):
     """Helper function to execute an automation phase"""
-    tid = f"tmp_{target_phase}_{time.time()}"
+    tid = f"crawler_{target_phase}_{time.time()}"
     print(tid)
     execute_automation_loop(default_task=task_prompt, max_loops=MAX_AUTOMATION_LOOPS, tid=tid)
 
+import subprocess
+def open_doubao():
+    subprocess.Popen(doubao_path)
 
 def open_doubao_and_navigate():
     """Phase 1: Open Doubao and navigate to search bar"""
@@ -46,10 +51,6 @@ def open_doubao_and_navigate():
     按照如下格式返回动作：
     <tool_call>
     {"name": "computer_use", "arguments": {"action": "double_click", "coordinate": [x, y]}}
-    </tool_call>
-    或者
-    <tool_call>
-    {"name": "computer_use", "arguments": {"action": "left_click", "coordinate": [x, y]}}
     </tool_call>
     或者
     <tool_call>
@@ -75,20 +76,7 @@ def scroll_and_copy_content():
     return content
 
 
-def expand_reference_details():
-    """Phase 2: Expand reference details panel"""
-    target_phase = "doubao_cua_2"
-    task_prompt = '''step 1 点击页面下方的x篇资料 step 2 界面右侧出现参考资料列表则结束任务
-    按照如下格式返回动作：
-    <tool_call>
-    {"name": "computer_use", "arguments": {"action": "left_click", "coordinate": [x, y]}}
-    </tool_call>
-    或
-    <tool_call>
-    {"name": "computer_use", "arguments": {"action": "terminate", "status": "success"}}
-    </tool_call>
-    '''
-    run_automation_phase(target_phase, task_prompt)
+
 
 
 def extract_reference_links(num_links):
@@ -116,27 +104,29 @@ def extract_reference_links(num_links):
     return links
 
 
-import os  # Ensure os is imported (should already be present)
+import os
 
-# ... existing code ...
 
 if __name__ == "__main__":
+
+
+
+
     df_queries = pd.read_csv('queries.csv')
 
-    # New: Remove results list - we'll save incrementally
-    # results = []
-
-    # Main workflow execution
+    open_doubao()
     for index, row in df_queries.iterrows():
         query = row['query']
         print(f"Processing query {index + 1}/{len(df_queries)}: {query}")
 
         # New: Wrap query processing in try-except to isolate errors
         try:
-            open_doubao_and_navigate()
+
+            click_text_position(r"新对话", match_type='contains')
+            click_text_position(r"发消息或输入", match_type='contains')
             perform_search(query)
             content = scroll_and_copy_content()
-            expand_reference_details()
+            click_text_position(r"(\d+)篇资料", match_type='contains')
             links = extract_reference_links(REFERENCE_LINK_COUNT)
 
             # New: Create single result DataFrame and append to CSV
@@ -156,12 +146,12 @@ if __name__ == "__main__":
             )
             print(f"Query {index + 1} results appended to query_results.csv")
 
+
         except Exception as e:
             print(f"Error processing query {index + 1}: {str(e)}")
-            # Continue to next query after error
 
-        finally:
-            # New: Ensure window closes even if error occurs
-            close_current_window()
+
+
+
 
     print("All queries processed. Results saved to query_results.csv")

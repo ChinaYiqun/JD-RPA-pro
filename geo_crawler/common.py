@@ -1,5 +1,11 @@
 import os
 import sys
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+sys.path.insert(0, parent_dir)
+
+import os
+import sys
 import time
 import json
 import requests
@@ -13,6 +19,9 @@ import pyperclip
 import signal
 
 import pygetwindow as gw
+
+from service.OCR import PaddleOCRSingleton
+
 
 def close_current_window():
     """关闭当前活动窗口"""
@@ -28,6 +37,38 @@ def capture_screenshot():
     screenshot.save(buffer, format="JPEG")
     return base64.b64encode(buffer.getvalue()).decode()
 
+import tempfile
+def click_text_position(target_text, match_type='contains'):
+    """Capture screen, find text position using OCR, and click the first match"""
+    # Capture current screen
+    screenshot = ImageGrab.grab()
+
+    # Save screenshot to temporary file
+    with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as tmp_file:
+        screenshot.save(tmp_file, format='PNG')
+        tmp_path = tmp_file.name
+
+    try:
+        # Initialize OCR and recognize text
+        ocr = PaddleOCRSingleton()
+        ocr.recognize(tmp_path)
+
+        # Get positions matching target text
+        positions = ocr.get_text_position_center_list(target_text, match_type)
+
+        if positions:
+            x, y = positions[0]
+            print(f"Clicking at coordinates: ({x}, {y})")
+            pyautogui.click(x, y)
+            return True
+        else:
+            print(f"No positions found for text: {target_text}")
+            return False
+    finally:
+        # Clean up temporary file
+        if os.path.exists(tmp_path):
+            os.remove(tmp_path)
+        time.sleep(1)
 
 def execute_automation_loop(default_task=r'''
         用户原始命令为：Step1 界面右侧的“查询补贴资格”，Step 2 关闭弹窗 Step3 停止任务
