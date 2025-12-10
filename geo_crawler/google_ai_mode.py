@@ -9,7 +9,7 @@ import pyautogui
 from PIL import Image
 import base64
 import json
-
+from my_mysql import connect_mysql_and_manage_table
 from openai import OpenAI
 import pyperclip
 
@@ -65,13 +65,6 @@ def get_absolute_coords(res_width, res_height, element_key):
     coords_map = get_coords_for_resolution(res_width, res_height)
     rel_x, rel_y = coords_map[element_key]
     return int(rel_x * res_width), int(rel_y * res_height)
-
-
-SCREEN_WIDTH, SCREEN_HEIGHT = pyautogui.size()  # 获取当前屏幕分辨率
-# input_x, input_y = get_absolute_coords(SCREEN_WIDTH, SCREEN_HEIGHT, "input_box")
-# print(input_x, input_y)
-# pyautogui.click(input_x, input_y)
-
 
 DEFAULT_BROWSER = "edge"
 GOOGLE_AI_URL = "https://www.google.com"  # 或你的 Google AI 具体 URL
@@ -351,15 +344,8 @@ def click_maximize_button():
 {"name": "computer_use", "arguments": {"action": "left_click", "coordinate": [x, y]}}
 </tool_call>
 （[x, y] 是 □ 按钮中心在 1000x1000 图中的坐标）
-
-或
-
-<tool_call>
-{"name": "computer_use", "arguments": {"action": "terminate", "status": "success"}}
-</tool_call>
-（如果窗口已最大化）
 """
-    success = execute_with_qwen_vl(prompt, max_steps=2)
+    success = execute_with_qwen_vl(prompt, max_steps=1)
     print("窗口已最大化" if success else "未能完成最大化操作")
     return success
 
@@ -449,10 +435,19 @@ if __name__ == "__main__":
         print("已创建示例 queries.csv，请编辑后重新运行。")
 
     df_queries = pd.read_csv('queries.csv')
+    # 连接数据库
+    conn = connect_mysql_and_manage_table()
+    if not conn:
+        print("无法连接数据库，程序退出。")
+        exit(1)
+
+    cursor = conn.cursor()
+
+
 
     for index, row in df_queries.iterrows():
-        if index == 5:
-            break
+        # if index == 5:
+        #     break
         time.sleep(3)
         query = str(row['query']).strip()
         if not query:
@@ -488,6 +483,35 @@ if __name__ == "__main__":
                 header=not os.path.exists('google_query_results.csv')
             )
             print(f"结果已保存到 google_query_results.csv")
+
+            # 准备插入数据库的数据
+            # 将 links 转换为符合 annotations 字段要求的 JSON 数组
+            annotations_list = [{"url": link} for link in links] if links else []
+            annotations_json = json.dumps(annotations_list, ensure_ascii=False)
+
+            insert_data = {
+                "query_id": index + 1,  # 简单使用行号作为 query_id（实际项目建议用唯一ID）
+                "query_text": query,
+                "platform": "Gemini",
+                "content": content,
+                "clean_text": "",  # 暂不处理
+                "content_analysis": "{}",
+                "annotation_analysis": "[]",
+                "annotations": annotations_json
+            }
+
+            insert_sql = """
+                         INSERT INTO collections (query_id, query_text, platform, content, \
+                                                  clean_text, content_analysis, annotation_analysis, annotations) \
+                         VALUES (%(query_id)s, %(query_text)s, %(platform)s, %(content)s, \
+                                 %(clean_text)s, %(content_analysis)s, %(annotation_analysis)s, %(annotations)s) \
+                         """
+
+            cursor.execute(insert_sql, insert_data)
+            conn.commit()
+            print(f"查询结果已成功存入数据库！")
+
+
             new_chat()
 
         except Exception as e:
