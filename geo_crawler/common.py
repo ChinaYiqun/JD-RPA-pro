@@ -47,12 +47,13 @@ def click_text_position(target_text, match_type='contains'):
     with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as tmp_file:
         screenshot.save(tmp_file, format='PNG')
         tmp_path = tmp_file.name
+        print(tmp_path)
 
     try:
         # Initialize OCR and recognize text
         ocr = PaddleOCRSingleton()
-        ocr.recognize(tmp_path)
-
+        result = ocr.recognize(tmp_path)
+        print(result)
         # Get positions matching target text
         positions = ocr.get_text_position_center_list(target_text, match_type)
 
@@ -66,8 +67,8 @@ def click_text_position(target_text, match_type='contains'):
             return False
     finally:
         # Clean up temporary file
-        if os.path.exists(tmp_path):
-            os.remove(tmp_path)
+        # if os.path.exists(tmp_path):
+        #     os.remove(tmp_path)
         time.sleep(1)
 
 def execute_automation_loop(default_task=r'''
@@ -168,6 +169,11 @@ def paste_text_at_mouse_position(text: str):
     pyautogui.hotkey('ctrl', 'v')  # 使用Ctrl+V粘贴文本（Windows系统）
     time.sleep(0.1)  # 短暂延迟确保剪贴板操作完成
 
+
+def fast_key_ctrl_k():
+    time.sleep(0.1)  # 短暂延迟确保剪贴板操作完成
+    pyautogui.hotkey('ctrl', 'k')  # 全选
+    time.sleep(0.1)
 
 def paste_all():
     time.sleep(0.1)  # 短暂延迟确保剪贴板操作完成

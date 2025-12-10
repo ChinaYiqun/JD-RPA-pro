@@ -40,6 +40,7 @@ def run_automation_phase(target_phase, task_prompt):
 import subprocess
 def open_doubao():
     subprocess.Popen(doubao_path)
+    time.sleep(3)
 
 def open_doubao_and_navigate():
     """Phase 1: Open Doubao and navigate to search bar"""
@@ -109,9 +110,7 @@ import os
 
 if __name__ == "__main__":
 
-
-
-
+    #
     df_queries = pd.read_csv('queries.csv')
 
     open_doubao()
@@ -122,7 +121,7 @@ if __name__ == "__main__":
         # New: Wrap query processing in try-except to isolate errors
         try:
 
-            click_text_position(r"新对话", match_type='contains')
+            fast_key_ctrl_k()
             click_text_position(r"发消息或输入", match_type='contains')
             perform_search(query)
             content = scroll_and_copy_content()
